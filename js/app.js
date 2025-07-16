@@ -479,27 +479,25 @@ function checkAllNodesPrime() {
 async function transitionToLcmGraph(number, instructionKey) {
   updateInstructions(instructionKey);
   
-  // 1. Remove hammer area, keep the factor tree visible for highlighting
+  // 1. Remove hammer area and breakdown text
   const hammerArea = activityArea.querySelector(".hammer-area");
   if (hammerArea) hammerArea.remove();
-
-  // Clear the breakdown text but keep the tree visible
   const breakdownText = activityArea.querySelector(".breakdown-text");
   if (breakdownText) breakdownText.remove();
 
-  // 2. Ensure factor tree is visible and ready for highlighting
+  // 2. Get factor tree for highlighting
   const factorTreeArea = activityArea.querySelector(".factor-tree-area");
   if (factorTreeArea) {
     factorTreeArea.classList.remove("faded");
   }
 
-  // 3. Do sequential highlighting of prime factors in the tree
+  // 3. Sequential highlighting of prime factors in the tree
   const finalFactors = Object.values(treeData)
     .filter((n) => n.childrenIds.length === 0)
     .map((n) => n.value)
     .sort((a, b) => a - b);
   
-  // Create the breakdown text for highlighting
+  // Create breakdown text for highlighting
   const newBreakdownText = document.createElement("div");
   newBreakdownText.className = "breakdown-text";
   const factorsHtml = finalFactors
@@ -511,10 +509,9 @@ async function transitionToLcmGraph(number, instructionKey) {
     factorTreeArea.appendChild(newBreakdownText);
   }
 
-  // 4. Prepare elements for highlighting
+  // 4. Do highlighting
   const elementsToHighlight = [];
   
-  // Add root number highlighting
   const rootNodeEl = Object.values(treeData)
     .find((n) => n.value === number)
     ?.element.querySelector(".tree-node");
@@ -523,7 +520,6 @@ async function transitionToLcmGraph(number, instructionKey) {
     elementsToHighlight.push({ text: rootTextEl, node: rootNodeEl });
   }
   
-  // Add prime factors highlighting
   const primeTextEls = Array.from(
     newBreakdownText.querySelectorAll(".num-prime")
   );
@@ -541,23 +537,24 @@ async function transitionToLcmGraph(number, instructionKey) {
     }
   });
   
-  // 5. Execute sequential highlighting (this will take time and user sees it)
+  // 5. Execute highlighting
   await sequentialHighlight(elementsToHighlight, 800, false);
   
-  // 6. Brief pause after highlighting completes
+  // 6. Brief pause
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  // 7. NOW show the LCM graph with factors already populated
+  // 7. HIDE factor tree completely
+  if (factorTreeArea) {
+    factorTreeArea.style.display = "none";
+  }
+  
+  // 8. Show LCM graph with factors already populated
   activityArea.style.flexDirection = "column";
   
-  // Create LCM graph area
   const lcmArea = document.createElement("div");
   lcmArea.className = "lcm-area";
   lcmArea.style.display = "flex";
-  lcmArea.style.opacity = "0";
-  lcmArea.style.transition = "opacity 0.5s ease-in-out";
   
-  // Create graph wrapper with factors already populated
   const graphWrapper = createLcmGraphDOM(number, finalFactors, 15, true, false, {
     showNodeValues: true
   });
@@ -565,19 +562,7 @@ async function transitionToLcmGraph(number, instructionKey) {
   lcmArea.appendChild(graphWrapper);
   activityArea.appendChild(lcmArea);
   
-  // Small delay for DOM to settle
-  await new Promise(resolve => setTimeout(resolve, 100));
-  
-  // 8. Fade in the completed LCM graph
-  lcmArea.style.opacity = "1";
-  
-  // 9. Wait for fade-in to complete
-  await new Promise(resolve => setTimeout(resolve, 600));
-
-  // 10. Fade out the factor tree area
-  if (factorTreeArea) factorTreeArea.classList.add("faded");
-
-  // 11. Enable next button
+  // 9. Enable next button
   nextButton.disabled = false;
   showFtue(nextButton);
 }
