@@ -628,6 +628,48 @@ body {
   display: none;
 }
 
+/* --- LCM Question Screen Styles --- */
+.lcm-options-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2vw;
+  margin-top: 3vh;
+  padding: 2vh 2vw;
+}
+
+.lcm-option-button {
+  padding: 1.5vh 3vw;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1.5vw;
+  font-size: calc(0.5rem + 1.5vw);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(145deg, #fba92d, #fdbe35);
+  color: white;
+  box-shadow: 0 0.5vh 1vh rgba(0, 0, 0, 0.3);
+  min-width: 12vw;
+  text-align: center;
+}
+
+.lcm-option-button:hover:not([disabled]) {
+  transform: translateY(-0.3vh);
+  box-shadow: 0 0.8vh 1.5vh rgba(0, 0, 0, 0.4);
+  background: linear-gradient(145deg, #fdbe35, #fba92d);
+}
+
+.lcm-option-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.lcm-option-button.shake {
+  animation: shake 0.5s ease-in-out;
+  background: linear-gradient(145deg, #d32f2f, #f44336);
+}
+
 /* --- FTUE STYLES --- */
 #hand-ftue {
   position: fixed;
