@@ -27,6 +27,15 @@ const QUESTIONS = [
     globalStepStart: 16,
     globalStepEnd: 30,
     globalFinalScreenStep: 31
+  },
+  {
+    id: "Q3",
+    numbers: { num1: 150, num2: 252 },
+    correctLcm: 6300,
+    lcmOptions: [6300, 3150, 12600],
+    globalStepStart: 32,
+    globalStepEnd: 46,
+    globalFinalScreenStep: 47
   }
 ];
 
@@ -89,6 +98,12 @@ function getInstructionKey(relativeStep, suffix = "", questionId = null) {
 // Initialization
 // =================
 function initApp() {
+  // Wait for texts to be ready before initializing
+  if (!window.APP_TEXTS || !window.APP_TEXTS.instructions) {
+    window.addEventListener('textsReady', initApp);
+    return;
+  }
+  
   appletContainer = document.querySelector(".applet-container");
   mainLayout = document.querySelector(".main-layout");
   leftPanel = document.querySelector(".left-panel-anchor");
@@ -1114,7 +1129,8 @@ function updateInstructions(key, params = {}) {
     }
   }
   
-  let instruction = T.instructions[instructionKey];
+  // Use the new nested structure: T.instructions[questionId][instructionKey]
+  let instruction = T.instructions[currentQuestion.id]?.[instructionKey];
   if (instruction) {
     let title = instruction.title;
     let text =
@@ -1148,6 +1164,10 @@ function updateInstructions(key, params = {}) {
 
         wrapper.appendChild(numberEl);
       });
+  } else {
+    // Fallback for missing instruction
+    console.warn(`Instruction not found: ${currentQuestion.id}.${instructionKey}`);
+    contextSection.innerHTML = `<h2>Step ${currentStep}</h2><div><p>Continue to the next step.</p></div>`;
   }
 }
 
