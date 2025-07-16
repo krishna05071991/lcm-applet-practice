@@ -478,39 +478,50 @@ function checkAllNodesPrime() {
 // =========================
 async function transitionToLcmGraph(number, instructionKey) {
   updateInstructions(instructionKey);
+  
   // 1. Remove hammer area and breakdown text, keep the factor tree
   const hammerArea = activityArea.querySelector(".hammer-area");
   if (hammerArea) hammerArea.remove();
 
-  // Remove the "Prime factorisation of..." text.
+  // Remove the "Prime factorisation of..." text
   const breakdownText = activityArea.querySelector(".breakdown-text");
   if (breakdownText) breakdownText.innerHTML = "";
 
   activityArea.style.flexDirection = "column";
 
-  // 2. Create and append the new graph area below the tree
+  // 2. Create empty LCM graph area (initially transparent)
   const lcmArea = document.createElement("div");
-  lcmArea.className = "lcm-area visible";
-  
-  // Make LCM area layout-visible but transparent for correct positioning
+  lcmArea.className = "lcm-area";
   lcmArea.style.display = "flex";
   lcmArea.style.opacity = "0";
   lcmArea.style.transition = "opacity 0.5s ease-in-out";
   
-  // Create graph with nodes having text
+  // Create empty graph wrapper (no factors yet)
   const graphWrapper = createLcmGraphDOM(number, [], 15, true, false, {
-    showNodeValues: true,
+    showNodeValues: true
   });
   
   lcmArea.appendChild(graphWrapper);
   activityArea.appendChild(lcmArea);
+  
+  // 3. Fade in the empty LCM graph first
+  await new Promise(resolve => setTimeout(resolve, 100)); // Small delay for DOM to settle
+  lcmArea.style.opacity = "1";
+  
+  // 4. Wait for fade-in to complete and user to register the empty graph
+  await new Promise(resolve => setTimeout(resolve, 600));
 
-  // 3. Animate nodes from the tree to the new graph
+  // 5. Now animate nodes from the tree to the visible LCM graph
   const animationPromises = [];
+  
+  // Animate root node
   const rootNodeEl = activityArea.querySelector(".tree-node:not(.prime)");
   const targetRootLabel = graphWrapper.querySelector(".lcm-graph-root-label");
-  animationPromises.push(animateNode(rootNodeEl, targetRootLabel, true));
+  if (rootNodeEl && targetRootLabel) {
+    animationPromises.push(animateNode(rootNodeEl, targetRootLabel, true));
+  }
 
+  // Animate prime nodes
   const primeNodesInTree = Array.from(
     activityArea.querySelectorAll(".factor-tree-area .tree-node.prime")
   );
@@ -519,35 +530,34 @@ async function transitionToLcmGraph(number, instructionKey) {
     const stack = graphWrapper.querySelector(
       `.lcm-node-stack[data-prime="${primeVal}"]`
     );
-    const targetPlaceholder = document.createElement("div");
-    targetPlaceholder.className = "tree-node prime";
-    targetPlaceholder.textContent = primeVal; // Add text content
-    targetPlaceholder.style.opacity = "0";
-    stack.appendChild(targetPlaceholder);
-    animationPromises.push(animateNode(primeNode, targetPlaceholder, true));
+    if (stack) {
+      const targetPlaceholder = document.createElement("div");
+      targetPlaceholder.className = "tree-node prime";
+      targetPlaceholder.textContent = primeVal;
+      targetPlaceholder.style.opacity = "0";
+      stack.appendChild(targetPlaceholder);
+      animationPromises.push(animateNode(primeNode, targetPlaceholder, true));
+    }
   }
 
-  // Wait for all node animations to complete
+  // 6. Wait for all node animations to complete
   await Promise.all(animationPromises);
 
-  // Fade in the LCM area smoothly after all animations complete
-  lcmArea.style.opacity = "1";
-  
-  // Set the final state of the graph nodes to be visible  
+  // 7. Ensure all nodes in the LCM graph are visible
   graphWrapper
     .querySelectorAll(".lcm-node-stack .tree-node")
     .forEach((node) => {
       node.style.opacity = "1";
     });
 
-  // Brief pause to let users register the LCM graph appearance
+  // 8. Brief pause to let users register the completed LCM graph
   await new Promise(resolve => setTimeout(resolve, 800));
   
-  // Then fade out the factor tree area
+  // 9. Fade out the factor tree area
   const factorTreeArea = activityArea.querySelector(".factor-tree-area");
   if (factorTreeArea) factorTreeArea.classList.add("faded");
 
-
+  // 10. Enable next button
   nextButton.disabled = false;
   showFtue(nextButton);
 }
