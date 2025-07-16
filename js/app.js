@@ -495,6 +495,12 @@ async function transitionToLcmGraph(number, instructionKey) {
   const graphWrapper = createLcmGraphDOM(number, [], 15, true, false, {
     showNodeValues: true,
   });
+  
+  // Initially hide the LCM graph wrapper
+  graphWrapper.style.opacity = "0";
+  graphWrapper.style.pointerEvents = "none";
+  graphWrapper.style.transition = "opacity 0.5s ease-in-out";
+  
   lcmArea.appendChild(graphWrapper);
   activityArea.appendChild(lcmArea);
 
@@ -522,6 +528,10 @@ async function transitionToLcmGraph(number, instructionKey) {
 
   await Promise.all(animationPromises);
 
+  // Show the LCM graph wrapper after all animations complete
+  graphWrapper.style.opacity = "1";
+  graphWrapper.style.pointerEvents = "auto";
+  
   // 4. Fade out the factor tree area after animation completes
   const factorTreeArea = activityArea.querySelector(".factor-tree-area");
   if (factorTreeArea) factorTreeArea.classList.add("faded");
