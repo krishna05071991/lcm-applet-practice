@@ -491,15 +491,14 @@ async function transitionToLcmGraph(number, instructionKey) {
   // 2. Create and append the new graph area below the tree
   const lcmArea = document.createElement("div");
   lcmArea.className = "lcm-area visible";
+  
+  // Initially hide the entire LCM area
+  lcmArea.style.display = "none";
+  
   // Create graph with nodes having text
   const graphWrapper = createLcmGraphDOM(number, [], 15, true, false, {
     showNodeValues: true,
   });
-  
-  // Initially hide the LCM graph wrapper
-  graphWrapper.style.opacity = "0";
-  graphWrapper.style.pointerEvents = "none";
-  graphWrapper.style.transition = "opacity 0.5s ease-in-out";
   
   lcmArea.appendChild(graphWrapper);
   activityArea.appendChild(lcmArea);
@@ -526,22 +525,26 @@ async function transitionToLcmGraph(number, instructionKey) {
     animationPromises.push(animateNode(primeNode, targetPlaceholder, true));
   }
 
+  // Wait for all node animations to complete
   await Promise.all(animationPromises);
 
-  // Show the LCM graph wrapper after all animations complete
-  graphWrapper.style.opacity = "1";
-  graphWrapper.style.pointerEvents = "auto";
+  // Show the entire LCM area after all animations complete
+  lcmArea.style.display = "flex";
   
-  // 4. Fade out the factor tree area after animation completes
-  const factorTreeArea = activityArea.querySelector(".factor-tree-area");
-  if (factorTreeArea) factorTreeArea.classList.add("faded");
-
   // Set the final state of the graph nodes to be visible
   graphWrapper
     .querySelectorAll(".lcm-node-stack .tree-node")
     .forEach((node) => {
       node.style.opacity = "1";
     });
+
+  // Brief pause to let users register the LCM graph appearance
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  // Then fade out the factor tree area
+  const factorTreeArea = activityArea.querySelector(".factor-tree-area");
+  if (factorTreeArea) factorTreeArea.classList.add("faded");
+
 
   nextButton.disabled = false;
   showFtue(nextButton);
