@@ -1,0 +1,80 @@
+# EdTech Applet Development - Technical Constraints for Bolt.new
+
+## Critical Technical Requirements
+
+**Frame & Display:**
+- Strictly 16:9 aspect ratio at all times (960x540, 1280x720, 1920x1080, 2560x1440, 3840x2160)
+- Central alignment when displayed on larger screens
+- Primary use case: widescreen TV display
+- Responsive content scaling while maintaining 16:9 dimensions
+
+**Platform & Compatibility:**
+- Must work across all webviews/browsers and TV app environments (React Native/Android Native)
+- Complete offline functionality from folder without server/localhost
+- Zero CORS errors or web-server dependencies
+- No online library calls or external CDN dependencies
+
+**Delivery Format:**
+- Single HTML file with embedded CSS and JavaScript, OR
+- Single ZIP file with all assets included
+- All dependencies must be bundled/embedded - no external links
+
+**Typography & Scaling:**
+- Use standard web-fonts: Baloo, Arial, or similar sans-serif
+- Font sizing: calc(rem + value) instead of px or rem for dynamic platform scaling
+- Avoid double-scaling when using JavaScript scale wrappers
+
+**Content & Layout:**
+- No content overflows except designated scrollable containers
+- Minimize scrolling sections (not intuitive for TV/applet use)
+- Remove background processes and animations that cause glitches
+- Implement explicit kill codes for animations/highlights when user actions occur
+
+**Input Handling:**
+- Support touch, mouse, stylus, and remote control input
+- Optimize for on-device compute - minimize processing redundancies
+- Next clickable button must have clear UI highlight indicating next action
+- Text and speech bubbles need attention-calling behavior when they change
+
+**Audio Requirements:**
+- Subtle background score capability
+- Foley sounds for all interactions and celebrations
+- Text-to-speech callout feature for any on-screen text
+
+**Internationalization:**
+- All text (static and dynamic) in separate JS files or identifiable arrays
+- Include English + Bahasa Indonesian + Filipino Tagalog language support
+- Simple flag-toggle system for language switching in index.html or JS file
+
+**Performance & Technical:**
+- DOM/Canvas optimization - remove background processes causing functional glitches
+- Explicit animation/highlight termination when new user actions occur
+- Efficient resource usage for TV/low-power device compatibility
+
+## Code Stack Recommendations
+
+**Use:**
+- Vanilla HTML5, CSS3, JavaScript (ES6+)
+- Embedded/inline CSS and JavaScript in single HTML file
+- Base64 encoded assets when possible
+- CSS Grid/Flexbox for 16:9 responsive layouts
+- Web Audio API for sound integration
+- Speech Synthesis API for text-to-speech
+
+**Avoid:**
+- External library dependencies
+- Framework dependencies (React, Vue, etc.) unless absolutely necessary
+- CDN links or external asset references
+- Complex build processes that create external dependencies
+- Background animations or processes that can't be explicitly controlled
+
+## Implementation Priority
+
+1. 16:9 aspect ratio maintenance across all screen sizes
+2. Offline functionality and single-file delivery
+3. Multi-input support (touch, mouse, remote)
+4. Clean, efficient code with explicit animation control
+5. Language support structure
+6. Audio integration capabilities
+
+Remember: This is for TV-first educational applets that must work completely offline and maintain strict aspect ratio requirements.
