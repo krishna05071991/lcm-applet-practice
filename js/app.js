@@ -27,7 +27,7 @@ let lcmBoxFactors = []; // Store factors selected for the LCM box
 
 // LCM Question Constants
 const CORRECT_LCM = 420;
-const LCM_OPTIONS = [210, 420, 840, 105]; // Correct answer + distractors
+const LCM_OPTIONS = [19, 420, 210]; // Correct answer + distractors
 
 // =================
 // Initialization
