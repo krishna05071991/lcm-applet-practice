@@ -555,7 +555,7 @@ async function transitionToLcmGraph(number, instructionKey) {
   lcmArea.className = "lcm-area";
   lcmArea.style.display = "flex";
   
-  const graphWrapper = createLcmGraphDOM(number, finalFactors, 15, true, false, {
+  const graphWrapper = createLcmGraphDOM(number, finalFactors, 25, true, false, {
     showNodeValues: true
   });
   
@@ -578,10 +578,10 @@ function drawLcmBoard(currentPrimeToSelect = null) {
 
   const factorsInBox = lcmBoxFactors.map((f) => f.prime);
 
-  // Use consistent rod height (10vh) for number graphs and a larger height (20vh) for the LCM box.
-  const graph1 = createLcmGraphDOM(currentQuestion.numbers.num1, factorizations[currentQuestion.numbers.num1], 15, true, false);
-  const graph2 = createLcmGraphDOM(currentQuestion.numbers.num2, factorizations[currentQuestion.numbers.num2], 10, true, false);
-  const lcmGraph = createLcmGraphDOM("LCM", factorsInBox, 15, true, false, {
+  // Use consistent rod height (25vh) for all graphs to ensure proper containment
+  const graph1 = createLcmGraphDOM(currentQuestion.numbers.num1, factorizations[currentQuestion.numbers.num1], 25, true, false);
+  const graph2 = createLcmGraphDOM(currentQuestion.numbers.num2, factorizations[currentQuestion.numbers.num2], 25, true, false);
+  const lcmGraph = createLcmGraphDOM("LCM", factorsInBox, 25, true, false, {
     isLcmBox: true,
   });
 
@@ -728,13 +728,9 @@ function mergeGraphsVisually() {
   activityArea.style.flexDirection = "column";
   activityArea.style.gap = "1vh"; // Reduce gap
 
-  const graph1 = createLcmGraphDOM(currentQuestion.numbers.num1, factorizations[currentQuestion.numbers.num1], 15, false, false); // No axis, no equation
-  const graph2 = createLcmGraphDOM(currentQuestion.numbers.num2, factorizations[currentQuestion.numbers.num2], 10, true, false); // With axis, no equation
+  const graph1 = createLcmGraphDOM(currentQuestion.numbers.num1, factorizations[currentQuestion.numbers.num1], 25, false, false); // No axis, no equation
+  const graph2 = createLcmGraphDOM(currentQuestion.numbers.num2, factorizations[currentQuestion.numbers.num2], 25, true, false); // With axis, no equation
 
-  // Custom height increase logic for rods in graph 2
-  graph2
-    .querySelectorAll(".lcm-rod")
-    .forEach((rod) => (rod.style.height = "16vh"));
 
   activityArea.appendChild(graph1);
   activityArea.appendChild(graph2);
@@ -765,7 +761,7 @@ function showLcmQuestion() {
   lcmContainer.className = "lcm-question-container";
   
   const factorsInBox = lcmBoxFactors.map((f) => f.prime);
-  const lcmGraph = createLcmGraphDOM("LCM", factorsInBox, 15, true, false, {
+  const lcmGraph = createLcmGraphDOM("LCM", factorsInBox, 25, true, false, {
     isLcmBox: true,
   });
   lcmGraph.classList.add("highlight-box");
