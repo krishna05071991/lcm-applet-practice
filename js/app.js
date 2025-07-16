@@ -6,6 +6,39 @@ if (!T) {
   console.error("Error: Text data not found. Ensure texts.js is loaded.");
 }
 
+// =================
+// Question Configuration
+// =================
+const QUESTIONS = [
+  {
+    id: "Q1",
+    numbers: { num1: 42, num2: 60 },
+    correctLcm: 420,
+    lcmOptions: [19, 420, 210],
+    globalStepStart: 0,
+    globalStepEnd: 14,
+    globalFinalScreenStep: 15
+  },
+  {
+    id: "Q2", 
+    numbers: { num1: 90, num2: 100 },
+    correctLcm: 900,
+    lcmOptions: [900, 450, 1800],
+    globalStepStart: 16,
+    globalStepEnd: 30,
+    globalFinalScreenStep: 31
+  },
+  {
+    id: "Q3",
+    numbers: { num1: 150, num2: 252 },
+    correctLcm: 6300,
+    lcmOptions: [6300, 3150, 12600],
+    globalStepStart: 32,
+    globalStepEnd: 46,
+    globalFinalScreenStep: 47
+  }
+];
+
 // Global DOM Elements
 let appletContainer,
   mainLayout,
@@ -18,6 +51,8 @@ let handFtue, handFtueImg;
 
 // App State
 let currentStep = 0;
+let currentQuestionIndex = 0;
+let currentQuestion = QUESTIONS[0];
 let treeData = {};
 let nextNodeId = 0;
 let activeNodeId = null;
@@ -25,14 +60,50 @@ let currentFactorizationTarget = 0;
 let factorizations = {}; // Store results { 12: [2, 2, 3], 15: [3, 5] }
 let lcmBoxFactors = []; // Store factors selected for the LCM box
 
-// LCM Question Constants
-const CORRECT_LCM = 420;
-const LCM_OPTIONS = [19, 420, 210]; // Correct answer + distractors
+// =================
+// Helper Functions
+// =================
+function getCurrentQuestionFromStep(globalStep) {
+  for (let i = 0; i < QUESTIONS.length; i++) {
+    const question = QUESTIONS[i];
+    if (globalStep >= question.globalStepStart && globalStep <= question.globalFinalScreenStep) {
+      return { question, index: i };
+    }
+  }
+  return { question: QUESTIONS[0], index: 0 };
+}
+
+function getRelativeStep(globalStep, question) {
+  return globalStep - question.globalStepStart;
+}
+
+function resetQuestionState() {
+  treeData = {};
+  nextNodeId = 0;
+  activeNodeId = null;
+  currentFactorizationTarget = 0;
+  factorizations = {};
+  lcmBoxFactors = [];
+}
+
+function getInstructionKey(relativeStep, suffix = "", questionId = null) {
+  const qId = questionId || currentQuestion.id;
+  if (suffix) {
+    return `step_${qId}_${relativeStep}_${suffix}`;
+  }
+  return `step_${qId}_${relativeStep}`;
+}
 
 // =================
 // Initialization
 // =================
 function initApp() {
+  // Wait for texts to be ready before initializing
+  if (!window.APP_TEXTS || !window.APP_TEXTS.instructions) {
+    window.addEventListener('textsReady', initApp);
+    return;
+  }
+  
   appletContainer = document.querySelector(".applet-container");
   mainLayout = document.querySelector(".main-layout");
   leftPanel = document.querySelector(".left-panel-anchor");
@@ -45,9 +116,15 @@ function initApp() {
   handFtue = document.getElementById("hand-ftue");
   handFtueImg = document.getElementById("hand-ftue-img");
 
-  document.getElementById("html_title").textContent = T.html_title;
-  document.getElementById("main_title_text").textContent = T.main_title_text;
+  // Initialize current question
+  currentQuestionIndex = 0;
+  currentQuestion = QUESTIONS[0];
+  
+  // Set initial title and text based on current question
+  document.getElementById("html_title").textContent = T.html_title(currentQuestion.numbers.num1, currentQuestion.numbers.num2);
+  document.getElementById("main_title_text").textContent = T.main_title_text(currentQuestion.numbers.num1, currentQuestion.numbers.num2);
   document.getElementById("subtitle_text").textContent = T.subtitle_text;
+  
   prevButton.textContent = T.button_texts.prev;
   nextButton.textContent = T.button_texts.next;
   handFtueImg.src = T.item_images.ftue_cursor;
@@ -65,34 +142,53 @@ function handleNextClick() {
   renderStep(currentStep + 1);
 }
 
-function renderStep(step) {
-  currentStep = step;
+function renderStep(globalStep) {
+  currentStep = globalStep;
+  
+  // Determine current question from global step
+  const { question, index } = getCurrentQuestionFromStep(globalStep);
+  
+  // Update current question if it changed
+  if (index !== currentQuestionIndex) {
+    currentQuestionIndex = index;
+    currentQuestion = question;
+    
+    // Update title and text for new question
+    document.getElementById("html_title").textContent = T.html_title(currentQuestion.numbers.num1, currentQuestion.numbers.num2);
+    document.getElementById("main_title_text").textContent = T.main_title_text(currentQuestion.numbers.num1, currentQuestion.numbers.num2);
+    
+    // Reset state for new question
+    resetQuestionState();
+  }
+  
+  const relativeStep = getRelativeStep(globalStep, currentQuestion);
+  
   nextButton.disabled = true;
   hideFtue();
   setJaxPose("normal");
   setContextBoxState("normal");
   appletContainer.classList.remove("initial-state");
 
-  // Clear layout at the start of specific steps
+  // Clear layout at the start of specific relative steps
   const stepsThatClearLayout = [0, 1, 4, 6, 13];
-  if (stepsThatClearLayout.includes(step)) {
+  if (stepsThatClearLayout.includes(relativeStep)) {
     activityArea.innerHTML = "";
   }
   // Default to row layout for most single-item displays
   activityArea.style.flexDirection = "row";
 
-  switch (step) {
+  switch (relativeStep) {
     case 0:
       cleanUpIntro();
       lcmBoxFactors = [];
       factorizations = {};
       appletContainer.classList.add("initial-state");
       rightPanel.style.display = "none";
-      updateInstructions("step_0");
+      updateInstructions(0);
       const startButtonContainer = document.createElement("div");
       startButtonContainer.id = "start-button-container";
       const startButton = createButton(T.button_texts.start, () =>
-        renderStep(1)
+        renderStep(globalStep + 1)
       );
       startButtonContainer.appendChild(startButton);
       leftPanel.appendChild(startButtonContainer);
@@ -102,28 +198,28 @@ function renderStep(step) {
     case 1:
       cleanUpIntro();
       rightPanel.style.display = "flex";
-      updateInstructions("step_1");
+      updateInstructions(1);
       activityArea.innerHTML = `<div class="hammer-intro-container"><img src="${T.item_images.hammer_passive}"></div>`;
       nextButton.disabled = false;
       showFtue(nextButton);
       break;
 
-    case 2: // Factorize 12
-      currentFactorizationTarget = 42;
-      startFactorization(currentFactorizationTarget, "step_2_start");
+    case 2: // Factorize first number
+      currentFactorizationTarget = currentQuestion.numbers.num1;
+      startFactorization(currentFactorizationTarget, getInstructionKey(2, "start"));
       break;
 
-    case 3: // Show graph for 42 factorization
-      transitionToLcmGraph(42, "step_3");
+    case 3: // Show graph for first number factorization
+      transitionToLcmGraph(currentQuestion.numbers.num1, getInstructionKey(3));
       break;
 
-    case 4: // Factorize 60
-      currentFactorizationTarget = 60;
-      startFactorization(currentFactorizationTarget, "step_4_start");
+    case 4: // Factorize second number
+      currentFactorizationTarget = currentQuestion.numbers.num2;
+      startFactorization(currentFactorizationTarget, getInstructionKey(4, "start"));
       break;
 
-    case 5: // Show graph for 60 factorization
-      transitionToLcmGraph(60, "step_5");
+    case 5: // Show graph for second number factorization
+      transitionToLcmGraph(currentQuestion.numbers.num2, getInstructionKey(5));
       break;
 
     case 6: // Merge graphs visually
@@ -135,19 +231,19 @@ function renderStep(step) {
       break;
 
     case 8: // Find LCM - Prime 2
-      renderLcmSelectionStep(2, "step_9_start", "step_9_correct", "step_9_incorrect");
+      renderLcmSelectionStep(2, getInstructionKey(8, "start"), getInstructionKey(8, "correct"), getInstructionKey(8, "incorrect"));
       break;
 
     case 9: // Find LCM - Prime 3
-      renderLcmSelectionStep(3, "step_10_start", "step_10_correct", "step_10_incorrect");
+      renderLcmSelectionStep(3, getInstructionKey(9, "start"), getInstructionKey(9, "correct"), getInstructionKey(9, "incorrect"));
       break;
 
     case 10: // Find LCM - Prime 5
-      renderLcmSelectionStep(5, "step_11_start", "step_11_correct", "step_11_incorrect");
+      renderLcmSelectionStep(5, getInstructionKey(10, "start"), getInstructionKey(10, "correct"), getInstructionKey(10, "incorrect"));
       break;
 
     case 11: // Find LCM - Prime 7
-      renderLcmSelectionStep(7, "step_12_start", "step_12_correct", "step_12_incorrect");
+      renderLcmSelectionStep(7, getInstructionKey(11, "start"), getInstructionKey(11, "correct"), getInstructionKey(11, "incorrect"));
       break;
 
     case 12: // Final LCM Result
@@ -168,14 +264,27 @@ function renderStep(step) {
       appletContainer.classList.add("initial-state");
       rightPanel.style.display = "none";
       setJaxPose("correct");
-      updateInstructions("final_screen");
-      const startOverContainer = document.createElement("div");
-      startOverContainer.id = "start-button-container";
-      const startOverButton = createButton(T.button_texts.start_over, () =>
-        renderStep(0)
-      );
-      startOverContainer.appendChild(startOverButton);
-      leftPanel.appendChild(startOverContainer);
+      updateInstructions(15);
+      
+      const buttonContainer = document.createElement("div");
+      buttonContainer.id = "start-button-container";
+      
+      // Check if there are more questions
+      if (currentQuestionIndex < QUESTIONS.length - 1) {
+        // "Next Question" button
+        const nextQuestionButton = createButton(T.button_texts.next_question, () =>
+          renderStep(QUESTIONS[currentQuestionIndex + 1].globalStepStart)
+        );
+        buttonContainer.appendChild(nextQuestionButton);
+      } else {
+        // "Start Over" button for the last question
+        const startOverButton = createButton(T.button_texts.start_over, () =>
+          renderStep(0)
+        );
+        buttonContainer.appendChild(startOverButton);
+      }
+      
+      leftPanel.appendChild(buttonContainer);
       break;
   }
 }
@@ -263,9 +372,12 @@ async function handleStrike(hammerEl, numberToStrike, nodeId) {
         activeNodeId = !treeData[child2Node.id].isPrime ? child2Node.id : null;
         const allPrime = checkAllNodesPrime();
 
+        // Determine instruction key based on current target and success state
+        const stepNum = currentFactorizationTarget === currentQuestion.numbers.num1 ? 2 : 4;
         const successTextKey = allPrime
-          ? `step_${currentFactorizationTarget === 42 ? 2 : 4}_done`
-          : `step_${currentFactorizationTarget === 42 ? 2 : 4}_success`;
+          ? getInstructionKey(stepNum, "done")
+          : getInstructionKey(stepNum, "success");
+        
         updateInstructions(successTextKey, {
           hammerNum,
           oldNum: numberToStrike,
@@ -323,10 +435,10 @@ async function handleStrike(hammerEl, numberToStrike, nodeId) {
         setJaxPose("wrong");
         setContextBoxState("incorrect");
         targetNodeEl.classList.add("incorrect");
-        updateInstructions(
-          `step_${currentFactorizationTarget === 42 ? 2 : 4}_fail`,
-          { hammerNum, num: numberToStrike }
-        );
+        
+        const stepNum = currentFactorizationTarget === currentQuestion.numbers.num1 ? 2 : 4;
+        updateInstructions(getInstructionKey(stepNum, "fail"), { hammerNum, num: numberToStrike });
+        
         setTimeout(() => {
           targetNodeEl.classList.remove("incorrect");
           setJaxPose("normal");
@@ -369,11 +481,9 @@ async function transitionToLcmGraph(number, instructionKey) {
   const hammerArea = activityArea.querySelector(".hammer-area");
   if (hammerArea) hammerArea.remove();
 
-  // ***** FIX 1 START *****
   // Remove the "Prime factorisation of..." text.
   const breakdownText = activityArea.querySelector(".breakdown-text");
   if (breakdownText) breakdownText.innerHTML = "";
-  // ***** FIX 1 END *****
 
   activityArea.style.flexDirection = "column";
 
@@ -437,18 +547,16 @@ function drawLcmBoard(currentPrimeToSelect = null) {
 
   const factorsInBox = lcmBoxFactors.map((f) => f.prime);
 
-  // ***** FIX 5 START *****
   // Use consistent rod height (10vh) for number graphs and a larger height (20vh) for the LCM box.
-  const graph42 = createLcmGraphDOM(42, factorizations[42], 15, true, false);
-  const graph60 = createLcmGraphDOM(60, factorizations[60], 10, true, false);
+  const graph1 = createLcmGraphDOM(currentQuestion.numbers.num1, factorizations[currentQuestion.numbers.num1], 15, true, false);
+  const graph2 = createLcmGraphDOM(currentQuestion.numbers.num2, factorizations[currentQuestion.numbers.num2], 10, true, false);
   const lcmGraph = createLcmGraphDOM("LCM", factorsInBox, 15, true, false, {
     isLcmBox: true,
   });
-  // ***** FIX 5 END *****
 
   lcmGraph.classList.add("highlight-box");
-  lcmArea.appendChild(graph42);
-  lcmArea.appendChild(graph60);
+  lcmArea.appendChild(graph1);
+  lcmArea.appendChild(graph2);
   lcmArea.appendChild(lcmGraph);
 
   if (currentPrimeToSelect) {
@@ -469,16 +577,16 @@ async function renderLcmSelectionStep(
   drawLcmBoard(prime);
   updateInstructions(startKey);
 
-  const label42 = activityArea.querySelector(
-    '.lcm-graph-wrapper[data-number="42"] .lcm-graph-root-label'
+  const label1 = activityArea.querySelector(
+    `.lcm-graph-wrapper[data-number="${currentQuestion.numbers.num1}"] .lcm-graph-root-label`
   );
-  const label60 = activityArea.querySelector(
-    '.lcm-graph-wrapper[data-number="60"] .lcm-graph-root-label'
+  const label2 = activityArea.querySelector(
+    `.lcm-graph-wrapper[data-number="${currentQuestion.numbers.num2}"] .lcm-graph-root-label`
   );
-  [label42, label60].forEach((l) => l.classList.add("clickable"));
+  [label1, label2].forEach((l) => l.classList.add("clickable"));
 
-  const factors42Count = factorizations[42].filter((f) => f === prime).length;
-  const factors60Count = factorizations[60].filter((f) => f === prime).length;
+  const factors1Count = factorizations[currentQuestion.numbers.num1].filter((f) => f === prime).length;
+  const factors2Count = factorizations[currentQuestion.numbers.num2].filter((f) => f === prime).length;
 
   const clickHandler = async (e) => {
     const clickedLabel = e.currentTarget;
@@ -486,20 +594,18 @@ async function renderLcmSelectionStep(
       clickedLabel.closest(".lcm-graph-wrapper").dataset.number
     );
 
-    // ***** FIX 4 START *****
     // Correctly handle the case where prime factor counts are equal.
     let isCorrect;
-    if (factors42Count > factors60Count) {
-      isCorrect = clickedNum === 42;
-    } else if (factors60Count > factors42Count) {
-      isCorrect = clickedNum === 60;
+    if (factors1Count > factors2Count) {
+      isCorrect = clickedNum === currentQuestion.numbers.num1;
+    } else if (factors2Count > factors1Count) {
+      isCorrect = clickedNum === currentQuestion.numbers.num2;
     } else {
-      // They are equal (e.g., for prime 3)
-      isCorrect = clickedNum === 42 || clickedNum === 60;
+      // They are equal
+      isCorrect = clickedNum === currentQuestion.numbers.num1 || clickedNum === currentQuestion.numbers.num2;
     }
-    // ***** FIX 4 END *****
 
-    [label42, label60].forEach((l) => {
+    [label1, label2].forEach((l) => {
       l.removeEventListener("click", clickHandler);
       l.classList.remove("clickable");
     });
@@ -537,7 +643,7 @@ async function renderLcmSelectionStep(
 
       await Promise.all(animationPromises);
 
-      const count = Math.max(factors42Count, factors60Count);
+      const count = Math.max(factors1Count, factors2Count);
       for (let i = 0; i < count; i++) {
         lcmBoxFactors.push({ prime: prime, source: clickedNum });
       }
@@ -553,70 +659,68 @@ async function renderLcmSelectionStep(
       setTimeout(() => {
         clickedLabel.classList.remove("shake");
         setContextBoxState("normal");
-        [label42, label60].forEach((l) => {
+        [label1, label2].forEach((l) => {
           l.addEventListener("click", clickHandler);
           l.classList.add("clickable");
         });
       }, 2000);
     }
   };
-  [label42, label60].forEach((l) => l.addEventListener("click", clickHandler));
+  [label1, label2].forEach((l) => l.addEventListener("click", clickHandler));
 }
 
 function showCombinedGraphs() {
-  updateInstructions("step_6");
+  updateInstructions(getInstructionKey(6));
   activityArea.innerHTML = "";
   // Set layout to vertical for this view
   activityArea.style.flexDirection = "column";
   activityArea.style.gap = "10vh";
 
-  // ***** FIX 2 START *****
   // Pass a new option to place the equation under the graph.
-  const graph42 = createLcmGraphDOM(42, factorizations[42], 15, true, true, {
+  const graph1 = createLcmGraphDOM(currentQuestion.numbers.num1, factorizations[currentQuestion.numbers.num1], 15, true, true, {
     equationUnderGraph: true,
   });
-  const graph60 = createLcmGraphDOM(60, factorizations[60], 10, true, true, {
+  const graph2 = createLcmGraphDOM(currentQuestion.numbers.num2, factorizations[currentQuestion.numbers.num2], 10, true, true, {
     equationUnderGraph: true,
   });
-  // ***** FIX 2 END *****
 
-  activityArea.appendChild(graph42);
-  activityArea.appendChild(graph60);
+  activityArea.appendChild(graph1);
+  activityArea.appendChild(graph2);
 
   nextButton.disabled = false;
   showFtue(nextButton);
 }
 
 function mergeGraphsVisually() {
-  updateInstructions("step_7");
+  updateInstructions(getInstructionKey(6));
   activityArea.innerHTML = "";
   activityArea.style.flexDirection = "column";
   activityArea.style.gap = "1vh"; // Reduce gap
 
-  const graph42 = createLcmGraphDOM(42, factorizations[42], 15, false, false); // No axis, no equation
-  const graph60 = createLcmGraphDOM(60, factorizations[60], 10, true, false); // With axis, no equation
+  const graph1 = createLcmGraphDOM(currentQuestion.numbers.num1, factorizations[currentQuestion.numbers.num1], 15, false, false); // No axis, no equation
+  const graph2 = createLcmGraphDOM(currentQuestion.numbers.num2, factorizations[currentQuestion.numbers.num2], 10, true, false); // With axis, no equation
 
-  // Custom height increase logic for rods in graph 60
-  graph60
+  // Custom height increase logic for rods in graph 2
+  graph2
     .querySelectorAll(".lcm-rod")
     .forEach((rod) => (rod.style.height = "16vh"));
 
-  activityArea.appendChild(graph42);
-  activityArea.appendChild(graph60);
+  activityArea.appendChild(graph1);
+  activityArea.appendChild(graph2);
 
   nextButton.disabled = false;
   showFtue(nextButton);
 }
 
 function introduceLcmBox() {
-  updateInstructions("step_8");
+  updateInstructions(getInstructionKey(7));
   drawLcmBoard();
   nextButton.disabled = false;
   showFtue(nextButton);
 }
 
 function showLcmQuestion() {
-  updateInstructions("step_13");
+  updateInstructions(getInstructionKey(13));
   
   // Clear activity area and set up layout
   activityArea.innerHTML = "";
@@ -646,18 +750,18 @@ function showLcmQuestion() {
   const optionsContainer = document.createElement("div");
   optionsContainer.className = "lcm-options-container";
   
-  LCM_OPTIONS.forEach((option) => {
+  currentQuestion.lcmOptions.forEach((option) => {
     const button = document.createElement("button");
     button.className = "lcm-option-button";
     button.textContent = option;
     
     button.addEventListener("click", () => {
-      if (option === CORRECT_LCM) {
+      if (option === currentQuestion.correctLcm) {
         // Correct answer
         audioPlay("correct");
         setJaxPose("correct");
         setContextBoxState("correct");
-        updateInstructions("step_13_correct");
+        updateInstructions(getInstructionKey(13, "correct"));
         
         // Disable all buttons
         optionsContainer.querySelectorAll("button").forEach(btn => {
@@ -676,14 +780,14 @@ function showLcmQuestion() {
         audioPlay("wrong");
         setJaxPose("wrong");
         setContextBoxState("incorrect");
-        updateInstructions("step_13_incorrect");
+        updateInstructions(getInstructionKey(13, "incorrect"));
         button.classList.add("incorrect");
         
         setTimeout(() => {
           button.classList.remove("incorrect");
           setJaxPose("normal");
           setContextBoxState("normal");
-          updateInstructions("step_13");
+          updateInstructions(getInstructionKey(13));
         }, 2000);
       }
     });
@@ -695,13 +799,13 @@ function showLcmQuestion() {
 }
 
 async function showFinalLcmResult() {
-  updateInstructions("step_13");
+  updateInstructions(getInstructionKey(14));
   drawLcmBoard();
   activityArea
-    .querySelector('.lcm-graph-wrapper[data-number="42"]')
+    .querySelector(`.lcm-graph-wrapper[data-number="${currentQuestion.numbers.num1}"]`)
     .classList.add("faded");
   activityArea
-    .querySelector('.lcm-graph-wrapper[data-number="60"]')
+    .querySelector(`.lcm-graph-wrapper[data-number="${currentQuestion.numbers.num2}"]`)
     .classList.add("faded");
 
   const lcmGraph = activityArea.querySelector(
@@ -782,7 +886,7 @@ function createLcmGraphDOM(
   rootLabel.innerHTML = number;
   if (isLcmBox) {
     rootLabel.classList.add("lcm-label");
-    rootLabel.innerHTML = "LCM of <br> 42 & 60";
+    rootLabel.innerHTML = `LCM of <br> ${currentQuestion.numbers.num1} & ${currentQuestion.numbers.num2}`;
   }
   wrapper.appendChild(rootLabel);
 
@@ -820,7 +924,6 @@ function createLcmGraphDOM(
     graphContainer.appendChild(axisBar);
   }
 
-  // ***** FIX 2 (Part 2) START *****
   // Add logic to place the equation under the graph if the option is passed.
   if (showEquation && factors.length > 0) {
     const equation = document.createElement("div");
@@ -838,7 +941,6 @@ function createLcmGraphDOM(
       wrapper.appendChild(equation);
     }
   }
-  // ***** FIX 2 (Part 2) END *****
 
   return wrapper;
 }
@@ -882,7 +984,6 @@ function animateNode(sourceNode, targetNode, hideTargetTemporarily = false) {
       clone.style.top = `${targetRect.top}px`;
     }, 50);
 
-    // ***** FIX 3 START *****
     // Increase timeout to 900ms to give the 800ms CSS transition time to fully complete
     // before the target node appears and the clone is removed.
     setTimeout(() => {
@@ -892,7 +993,6 @@ function animateNode(sourceNode, targetNode, hideTargetTemporarily = false) {
         resolve();
       }, 500);
     }, 1000);
-    // ***** FIX 3 END *****
   });
 }
 
@@ -1016,7 +1116,21 @@ function hideFtue() {
 
 function updateInstructions(key, params = {}) {
   const contextSection = document.querySelector(".context-section");
-  let instruction = T.instructions[key];
+  let instructionKey;
+  
+  if (typeof key === "string") {
+    instructionKey = key;
+  } else {
+    // key is a relative step number
+    if (key === 15) {
+      instructionKey = `final_screen_${currentQuestion.id}`;
+    } else {
+      instructionKey = getInstructionKey(key);
+    }
+  }
+  
+  // Use the new nested structure: T.instructions[questionId][instructionKey]
+  let instruction = T.instructions[currentQuestion.id]?.[instructionKey];
   if (instruction) {
     let title = instruction.title;
     let text =
@@ -1050,6 +1164,10 @@ function updateInstructions(key, params = {}) {
 
         wrapper.appendChild(numberEl);
       });
+  } else {
+    // Fallback for missing instruction
+    console.warn(`Instruction not found: ${currentQuestion.id}.${instructionKey}`);
+    contextSection.innerHTML = `<h2>Step ${currentStep}</h2><div><p>Continue to the next step.</p></div>`;
   }
 }
 
