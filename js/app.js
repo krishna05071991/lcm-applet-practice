@@ -25,6 +25,10 @@ let currentFactorizationTarget = 0;
 let factorizations = {}; // Store results { 12: [2, 2, 3], 15: [3, 5] }
 let lcmBoxFactors = []; // Store factors selected for the LCM box
 
+// LCM Question Constants
+const CORRECT_LCM = 420;
+const LCM_OPTIONS = [210, 420, 840, 105]; // Correct answer + distractors
+
 // =================
 // Initialization
 // =================
@@ -150,7 +154,15 @@ function renderStep(step) {
       showFinalLcmResult();
       break;
 
-    case 13: // Final Screen
+    case 13: // LCM Question Screen
+      showLcmQuestion();
+      break;
+
+    case 14: // Show Final Result
+      showFinalLcmResult();
+      break;
+
+    case 15: // Final Screen
       activityArea.innerHTML = "";
       cleanUpIntro();
       appletContainer.classList.add("initial-state");

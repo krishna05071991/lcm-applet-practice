@@ -167,6 +167,26 @@ const ALL_TEXTS = {
           text: "Let's Find LCM!<br>LCM of 42 and 60<br>= <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='3'>3</span> × <span class='num-prime' data-value='5'>5</span> × <span class='num-prime' data-value='7'>7</span><br>= 420",
         },
 
+        step_13: {
+          title: "Your Turn!",
+          text: "Tap the correct LCM of 42 and 60.",
+        },
+
+        step_13_correct_feedback: {
+          title: "Excellent!",
+          text: "That's correct! The LCM of 42 and 60 is 420.",
+        },
+
+        step_13_incorrect_feedback: {
+          title: "Try Again!",
+          text: "That's not correct. Think about the prime factors: 2 × 2 × 3 × 5 × 7.",
+        },
+
+        step_14: {
+          title: "The Result!",
+          text: "Let's Find LCM!<br>LCM of 42 and 60<br>= <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='3'>3</span> × <span class='num-prime' data-value='5'>5</span> × <span class='num-prime' data-value='7'>7</span><br>= 420",
+        },
+
         final_screen: {
           title: "Great Job!",
           text: "Yay! We did it! We learned how to find the LCM using prime factorisation!",
@@ -336,6 +356,26 @@ const ALL_TEXTS = {
         },
 
         step_13: {
+          title: "Hasilnya!",
+          text: "Ayo Cari KPK!<br>KPK dari 42 dan 60<br>= <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='3'>3</span> × <span class='num-prime' data-value='5'>5</span> × <span class='num-prime' data-value='7'>7</span><br>= 420",
+        },
+
+        step_13: {
+          title: "Giliranmu!",
+          text: "Ketuk KPK yang benar dari 42 dan 60.",
+        },
+
+        step_13_correct_feedback: {
+          title: "Luar Biasa!",
+          text: "Itu benar! KPK dari 42 dan 60 adalah 420.",
+        },
+
+        step_13_incorrect_feedback: {
+          title: "Coba Lagi!",
+          text: "Itu tidak benar. Pikirkan tentang faktor prima: 2 × 2 × 3 × 5 × 7.",
+        },
+
+        step_14: {
           title: "Hasilnya!",
           text: "Ayo Cari KPK!<br>KPK dari 42 dan 60<br>= <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='3'>3</span> × <span class='num-prime' data-value='5'>5</span> × <span class='num-prime' data-value='7'>7</span><br>= 420",
         },
