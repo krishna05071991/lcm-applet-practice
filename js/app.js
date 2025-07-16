@@ -247,8 +247,9 @@ function renderStep(globalStep) {
       break;
 
     case 12: // Final LCM Result
-      showFinalLcmResult();
-      break;
+      // Skip the result screen and go directly to the multiple choice question
+      renderStep(globalStep + 1);
+      return;
 
     case 13: // LCM Question Screen
       showLcmQuestion();
