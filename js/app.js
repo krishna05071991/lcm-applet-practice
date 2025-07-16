@@ -105,26 +105,22 @@ function renderStep(step) {
       break;
 
     case 2: // Factorize 12
-      currentFactorizationTarget = 12;
+      currentFactorizationTarget = 42;
       startFactorization(currentFactorizationTarget, "step_2_start");
       break;
 
-    case 3: // Show graph for 12 factorization
-      transitionToLcmGraph(12, "step_3");
+    case 3: // Show graph for 42 factorization
+      transitionToLcmGraph(42, "step_3");
       break;
 
-    case 4: // Factorize 15
-      currentFactorizationTarget = 15;
+    case 4: // Factorize 60
+      currentFactorizationTarget = 60;
       startFactorization(currentFactorizationTarget, "step_4_start");
       break;
 
-    case 5: // Show graph for 15 factorization
-      transitionToLcmGraph(15, "step_5");
+    case 5: // Show graph for 60 factorization
+      transitionToLcmGraph(60, "step_5");
       break;
-
-    // case 6: // Show both graphs for comparison
-    //   showCombinedGraphs();
-    //   break;
 
     case 6: // Merge graphs visually
       mergeGraphsVisually();
@@ -135,37 +131,26 @@ function renderStep(step) {
       break;
 
     case 8: // Find LCM - Prime 2
-      renderLcmSelectionStep(
-        2,
-        "step_9_start",
-        "step_9_correct",
-        "step_9_incorrect"
-      );
+      renderLcmSelectionStep(2, "step_9_start", "step_9_correct", "step_9_incorrect");
       break;
 
     case 9: // Find LCM - Prime 3
-      renderLcmSelectionStep(
-        3,
-        "step_10_start",
-        "step_10_correct",
-        "step_10_incorrect"
-      );
+      renderLcmSelectionStep(3, "step_10_start", "step_10_correct", "step_10_incorrect");
       break;
 
     case 10: // Find LCM - Prime 5
-      renderLcmSelectionStep(
-        5,
-        "step_11_start",
-        "step_11_correct",
-        "step_11_incorrect"
-      );
+      renderLcmSelectionStep(5, "step_11_start", "step_11_correct", "step_11_incorrect");
       break;
 
-    case 11: // Final LCM Result
+    case 11: // Find LCM - Prime 7
+      renderLcmSelectionStep(7, "step_12_start", "step_12_correct", "step_12_incorrect");
+      break;
+
+    case 12: // Final LCM Result
       showFinalLcmResult();
       break;
 
-    case 12: // Final Screen
+    case 13: // Final Screen
       activityArea.innerHTML = "";
       cleanUpIntro();
       appletContainer.classList.add("initial-state");
@@ -267,8 +252,8 @@ async function handleStrike(hammerEl, numberToStrike, nodeId) {
         const allPrime = checkAllNodesPrime();
 
         const successTextKey = allPrime
-          ? `step_${currentFactorizationTarget === 12 ? 2 : 4}_done`
-          : `step_${currentFactorizationTarget === 12 ? 2 : 4}_success`;
+          ? `step_${currentFactorizationTarget === 42 ? 2 : 4}_done`
+          : `step_${currentFactorizationTarget === 42 ? 2 : 4}_success`;
         updateInstructions(successTextKey, {
           hammerNum,
           oldNum: numberToStrike,
@@ -327,7 +312,7 @@ async function handleStrike(hammerEl, numberToStrike, nodeId) {
         setContextBoxState("incorrect");
         targetNodeEl.classList.add("incorrect");
         updateInstructions(
-          `step_${currentFactorizationTarget === 12 ? 2 : 4}_fail`,
+          `step_${currentFactorizationTarget === 42 ? 2 : 4}_fail`,
           { hammerNum, num: numberToStrike }
         );
         setTimeout(() => {
@@ -442,16 +427,16 @@ function drawLcmBoard(currentPrimeToSelect = null) {
 
   // ***** FIX 5 START *****
   // Use consistent rod height (10vh) for number graphs and a larger height (20vh) for the LCM box.
-  const graph12 = createLcmGraphDOM(12, factorizations[12], 15, true, false);
-  const graph15 = createLcmGraphDOM(15, factorizations[15], 10, true, false);
+  const graph42 = createLcmGraphDOM(42, factorizations[42], 15, true, false);
+  const graph60 = createLcmGraphDOM(60, factorizations[60], 10, true, false);
   const lcmGraph = createLcmGraphDOM("LCM", factorsInBox, 15, true, false, {
     isLcmBox: true,
   });
   // ***** FIX 5 END *****
 
   lcmGraph.classList.add("highlight-box");
-  lcmArea.appendChild(graph12);
-  lcmArea.appendChild(graph15);
+  lcmArea.appendChild(graph42);
+  lcmArea.appendChild(graph60);
   lcmArea.appendChild(lcmGraph);
 
   if (currentPrimeToSelect) {
@@ -472,16 +457,16 @@ async function renderLcmSelectionStep(
   drawLcmBoard(prime);
   updateInstructions(startKey);
 
-  const label12 = activityArea.querySelector(
-    '.lcm-graph-wrapper[data-number="12"] .lcm-graph-root-label'
+  const label42 = activityArea.querySelector(
+    '.lcm-graph-wrapper[data-number="42"] .lcm-graph-root-label'
   );
-  const label15 = activityArea.querySelector(
-    '.lcm-graph-wrapper[data-number="15"] .lcm-graph-root-label'
+  const label60 = activityArea.querySelector(
+    '.lcm-graph-wrapper[data-number="60"] .lcm-graph-root-label'
   );
-  [label12, label15].forEach((l) => l.classList.add("clickable"));
+  [label42, label60].forEach((l) => l.classList.add("clickable"));
 
-  const factors12Count = factorizations[12].filter((f) => f === prime).length;
-  const factors15Count = factorizations[15].filter((f) => f === prime).length;
+  const factors42Count = factorizations[42].filter((f) => f === prime).length;
+  const factors60Count = factorizations[60].filter((f) => f === prime).length;
 
   const clickHandler = async (e) => {
     const clickedLabel = e.currentTarget;
@@ -492,17 +477,17 @@ async function renderLcmSelectionStep(
     // ***** FIX 4 START *****
     // Correctly handle the case where prime factor counts are equal.
     let isCorrect;
-    if (factors12Count > factors15Count) {
-      isCorrect = clickedNum === 12;
-    } else if (factors15Count > factors12Count) {
-      isCorrect = clickedNum === 15;
+    if (factors42Count > factors60Count) {
+      isCorrect = clickedNum === 42;
+    } else if (factors60Count > factors42Count) {
+      isCorrect = clickedNum === 60;
     } else {
       // They are equal (e.g., for prime 3)
-      isCorrect = clickedNum === 12 || clickedNum === 15;
+      isCorrect = clickedNum === 42 || clickedNum === 60;
     }
     // ***** FIX 4 END *****
 
-    [label12, label15].forEach((l) => {
+    [label42, label60].forEach((l) => {
       l.removeEventListener("click", clickHandler);
       l.classList.remove("clickable");
     });
@@ -540,7 +525,7 @@ async function renderLcmSelectionStep(
 
       await Promise.all(animationPromises);
 
-      const count = Math.max(factors12Count, factors15Count);
+      const count = Math.max(factors42Count, factors60Count);
       for (let i = 0; i < count; i++) {
         lcmBoxFactors.push({ prime: prime, source: clickedNum });
       }
@@ -556,14 +541,14 @@ async function renderLcmSelectionStep(
       setTimeout(() => {
         clickedLabel.classList.remove("shake");
         setContextBoxState("normal");
-        [label12, label15].forEach((l) => {
+        [label42, label60].forEach((l) => {
           l.addEventListener("click", clickHandler);
           l.classList.add("clickable");
         });
       }, 2000);
     }
   };
-  [label12, label15].forEach((l) => l.addEventListener("click", clickHandler));
+  [label42, label60].forEach((l) => l.addEventListener("click", clickHandler));
 }
 
 function showCombinedGraphs() {
@@ -575,16 +560,16 @@ function showCombinedGraphs() {
 
   // ***** FIX 2 START *****
   // Pass a new option to place the equation under the graph.
-  const graph12 = createLcmGraphDOM(12, factorizations[12], 15, true, true, {
+  const graph42 = createLcmGraphDOM(42, factorizations[42], 15, true, true, {
     equationUnderGraph: true,
   });
-  const graph15 = createLcmGraphDOM(15, factorizations[15], 10, true, true, {
+  const graph60 = createLcmGraphDOM(60, factorizations[60], 10, true, true, {
     equationUnderGraph: true,
   });
   // ***** FIX 2 END *****
 
-  activityArea.appendChild(graph12);
-  activityArea.appendChild(graph15);
+  activityArea.appendChild(graph42);
+  activityArea.appendChild(graph60);
 
   nextButton.disabled = false;
   showFtue(nextButton);
@@ -596,16 +581,16 @@ function mergeGraphsVisually() {
   activityArea.style.flexDirection = "column";
   activityArea.style.gap = "1vh"; // Reduce gap
 
-  const graph12 = createLcmGraphDOM(12, factorizations[12], 15, false, false); // No axis, no equation
-  const graph15 = createLcmGraphDOM(15, factorizations[15], 10, true, false); // With axis, no equation
+  const graph42 = createLcmGraphDOM(42, factorizations[42], 15, false, false); // No axis, no equation
+  const graph60 = createLcmGraphDOM(60, factorizations[60], 10, true, false); // With axis, no equation
 
-  // Custom height increase logic for rods in graph 15
-  graph15
+  // Custom height increase logic for rods in graph 60
+  graph60
     .querySelectorAll(".lcm-rod")
     .forEach((rod) => (rod.style.height = "16vh"));
 
-  activityArea.appendChild(graph12);
-  activityArea.appendChild(graph15);
+  activityArea.appendChild(graph42);
+  activityArea.appendChild(graph60);
 
   nextButton.disabled = false;
   showFtue(nextButton);
@@ -619,13 +604,13 @@ function introduceLcmBox() {
 }
 
 async function showFinalLcmResult() {
-  updateInstructions("step_12");
+  updateInstructions("step_13");
   drawLcmBoard();
   activityArea
-    .querySelector('.lcm-graph-wrapper[data-number="12"]')
+    .querySelector('.lcm-graph-wrapper[data-number="42"]')
     .classList.add("faded");
   activityArea
-    .querySelector('.lcm-graph-wrapper[data-number="15"]')
+    .querySelector('.lcm-graph-wrapper[data-number="60"]')
     .classList.add("faded");
 
   const lcmGraph = activityArea.querySelector(
@@ -706,7 +691,7 @@ function createLcmGraphDOM(
   rootLabel.innerHTML = number;
   if (isLcmBox) {
     rootLabel.classList.add("lcm-label");
-    rootLabel.innerHTML = "LCM of <br> 12 & 15";
+    rootLabel.innerHTML = "LCM of <br> 42 & 60";
   }
   wrapper.appendChild(rootLabel);
 

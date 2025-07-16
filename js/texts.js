@@ -7,8 +7,8 @@ const CURRENT_LANGUAGE = "en";
 const ALL_TEXTS = {
   en: {
     appTexts: {
-      html_title: "LCM with Prime Factorization",
-      main_title_text: "Finding the LCM",
+      html_title: "LCM with Prime Factorization - 42 and 60",
+      main_title_text: "Finding the LCM of 42 and 60",
       subtitle_text:
         "Using prime factorization to find the Least Common Multiple.",
       factorisation_text:"Prime factorisation of",
@@ -40,17 +40,17 @@ const ALL_TEXTS = {
       instructions: {
         step_0: {
           title: "Hello!",
-          text: "Today, let’s explore finding the LCM of 12 and 15 using prime factorisation.",
+          text: "Today, let's explore finding the LCM of 42 and 60 using prime factorisation.",
         },
         step_1: {
           title: "Magical Hammer",
-          text: "Time to use my magical hammer to find the prime factorisation of 12 and 15!",
+          text: "Time to use my magical hammer to find the prime factorisation of 42 and 60!",
         },
 
-        // Factorization of 12
+        // Factorization of 42
         step_2_start: {
-          title: "Factorize 12",
-          text: "Use the hammers provided and break the number 12 until every part is a prime number.",
+          title: "Factorize 42",
+          text: "Use the hammers provided and break the number 42 until every part is a prime number.",
         },
         step_2_success: {
           title: "Great!",
@@ -70,13 +70,13 @@ const ALL_TEXTS = {
 
         step_3: {
           title: "Visualizing Factors",
-          text: "So, 12 is made of two 2s and one 3. We’ve placed them in the prime rods box of 12!",
+          text: "So, 42 is made of one 2, one 3, and one 7. We've placed them in the prime rods box of 42!",
         },
 
-        // Factorization of 15
+        // Factorization of 60
         step_4_start: {
-          title: "Factorize 15",
-          text: "Now, let’s break 15 into smaller parts using the hammers until every part is a prime number!",
+          title: "Factorize 60",
+          text: "Now, let's break 60 into smaller parts using the hammers until every part is a prime number!",
         },
         step_4_success: {
           title: "Great!",
@@ -96,7 +96,7 @@ const ALL_TEXTS = {
 
         step_5: {
           title: "Visualizing Factors",
-          text: "Great! 15 is made of one 3 and one 5. Let's see its prime rods box.",
+          text: "Great! 60 is made of two 2s, one 3, and one 5. Let's see its prime rods box.",
         },
 
         // Combining for LCM
@@ -106,17 +106,17 @@ const ALL_TEXTS = {
         },
         step_7: {
           title: "Ready for LCM",
-          text: "We have brought the prime rods boxs of 12 and 15 together to find LCM.",
+          text: "We have brought the prime rods boxs of 42 and 60 together to find LCM.",
         },
         step_8: {
           title: "The LCM Box",
-          text: "Here is the LCM box. We will use this to find the LCM of 12 and 15.",
+          text: "Here is the LCM box. We will use this to find the LCM of 42 and 60.",
         },
 
         // Finding LCM steps
         step_9_start: {
           title: "Let’s Find LCM!",
-          text: " Start with the prime-2 rod. Tap 12 or 15—the one with more 2’s.",
+          text: " Start with the prime-2 rod. Tap 42 or 60—the one with more 2's.",
         },
         step_9_correct: {
           title: "Correct!",
@@ -124,12 +124,12 @@ const ALL_TEXTS = {
         },
         step_9_incorrect: {
           title: "Try Again!",
-          text: "Oops! 2 appears twice in 12 but not in 15.",
+          text: "Oops! 60 has two 2s, but 42 has only one 2.",
         },
 
         step_10_start: {
           title: "Let’s Find LCM!",
-          text: "Now, look at the prime-3 rod. Both 12 and 15 have one 3. Tap either 12 or 15 to bring 3 to the LCM box.",
+          text: "Now, look at the prime-3 rod. Both 42 and 60 have one 3. Tap either 42 or 60 to bring 3 to the LCM box.",
         },
         step_10_correct: {
           title: "Yay!",
@@ -138,7 +138,7 @@ const ALL_TEXTS = {
 
         step_11_start: {
           title: "Let’s Find LCM!",
-          text: "Lastly, the prime-5 rod. Tap 12 or 15—the one with more 5’s.",
+          text: "Now, the prime-5 rod. Tap 42 or 60—the one with more 5's.",
         },
         step_11_correct: {
           title: "Correct!",
@@ -146,12 +146,25 @@ const ALL_TEXTS = {
         },
         step_11_incorrect: {
           title: "Try Again!",
-          text: "Oops! 15 has a 5, but 12 does not.",
+          text: "Oops! 60 has a 5, but 42 does not.",
         },
 
-        step_12: {
+        step_12_start: {
+          title: "Let's Find LCM!",
+          text: "Finally, the prime-7 rod. Tap 42 or 60—the one with more 7's.",
+        },
+        step_12_correct: {
+          title: "Correct!",
+          text: "That's Correct! We have placed one 7 in the LCM box.",
+        },
+        step_12_incorrect: {
+          title: "Try Again!",
+          text: "Oops! 42 has a 7, but 60 does not.",
+        },
+
+        step_13: {
           title: "The Result!",
-          text: "Let’s Find LCM!<br>LCM of 12 and 15<br>= <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='3'>3</span> × <span class='num-prime' data-value='5'>5</span><br>= 60",
+          text: "Let's Find LCM!<br>LCM of 42 and 60<br>= <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='3'>3</span> × <span class='num-prime' data-value='5'>5</span> × <span class='num-prime' data-value='7'>7</span><br>= 420",
         },
 
         final_screen: {
@@ -167,8 +180,8 @@ const ALL_TEXTS = {
   },
   id: {
     appTexts: {
-      html_title: "KPK dengan Faktorisasi Prima",
-      main_title_text: "Mencari KPK",
+      html_title: "KPK dengan Faktorisasi Prima - 42 dan 60",
+      main_title_text: "Mencari KPK dari 42 dan 60",
       factorisation_text:"Faktorisasi prima dari",
       subtitle_text:
         "Menggunakan faktorisasi prima untuk mencari Kelipatan Persekutuan Terkecil.",
@@ -200,17 +213,17 @@ const ALL_TEXTS = {
       instructions: {
         step_0: {
           title: "Halo!",
-          text: "Hari ini, mari kita jelajahi cara mencari KPK dari 12 dan 15 menggunakan faktorisasi prima.",
+          text: "Hari ini, mari kita jelajahi cara mencari KPK dari 42 dan 60 menggunakan faktorisasi prima.",
         },
         step_1: {
           title: "Palu Ajaib",
-          text: "Saatnya menggunakan palu ajaibku untuk menemukan faktorisasi prima dari 12 dan 15!",
+          text: "Saatnya menggunakan palu ajaibku untuk menemukan faktorisasi prima dari 42 dan 60!",
         },
 
-        // Factorization of 12
+        // Factorization of 42
         step_2_start: {
-          title: "Faktorkan 12",
-          text: "Gunakan palu yang disediakan dan pecahkan angka 12 sampai setiap bagiannya menjadi bilangan prima.",
+          title: "Faktorkan 42",
+          text: "Gunakan palu yang disediakan dan pecahkan angka 42 sampai setiap bagiannya menjadi bilangan prima.",
         },
         step_2_success: {
           title: "Bagus!",
@@ -230,13 +243,13 @@ const ALL_TEXTS = {
 
         step_3: {
           title: "Memvisualisasikan Faktor",
-          text: "Jadi, 12 terdiri dari dua angka 2 dan satu angka 3. Kami telah menempatkannya di kotak batang prima 12!",
+          text: "Jadi, 42 terdiri dari satu angka 2, satu angka 3, dan satu angka 7. Kami telah menempatkannya di kotak batang prima 42!",
         },
 
-        // Factorization of 15
+        // Factorization of 60
         step_4_start: {
-          title: "Faktorkan 15",
-          text: "Sekarang, mari kita pecah 15 menjadi bagian-bagian yang lebih kecil menggunakan palu sampai setiap bagiannya menjadi bilangan prima!",
+          title: "Faktorkan 60",
+          text: "Sekarang, mari kita pecah 60 menjadi bagian-bagian yang lebih kecil menggunakan palu sampai setiap bagiannya menjadi bilangan prima!",
         },
         step_4_success: {
           title: "Bagus!",
@@ -256,7 +269,7 @@ const ALL_TEXTS = {
 
         step_5: {
           title: "Memvisualisasikan Faktor",
-          text: "Bagus! 15 terdiri dari satu angka 3 dan satu angka 5. Mari kita lihat kotak batang primanya.",
+          text: "Bagus! 60 terdiri dari dua angka 2, satu angka 3, dan satu angka 5. Mari kita lihat kotak batang primanya.",
         },
 
         // Combining for LCM
@@ -266,17 +279,17 @@ const ALL_TEXTS = {
         },
         step_7: {
           title: "Siap untuk KPK",
-          text: "Kami telah menyatukan kotak batang prima dari 12 dan 15 untuk mencari KPK.",
+          text: "Kami telah menyatukan kotak batang prima dari 42 dan 60 untuk mencari KPK.",
         },
         step_8: {
           title: "Kotak KPK",
-          text: "Ini adalah kotak KPK. Kita akan menggunakan ini untuk mencari KPK dari 12 dan 15.",
+          text: "Ini adalah kotak KPK. Kita akan menggunakan ini untuk mencari KPK dari 42 dan 60.",
         },
 
         // Finding LCM steps
         step_9_start: {
           title: "Mari Menemukan KPK",
-          text: "Mulai dengan batang prima-2. Ketuk 12 atau 15—yang memiliki lebih banyak angka 2.",
+          text: "Mulai dengan batang prima-2. Ketuk 42 atau 60—yang memiliki lebih banyak angka 2.",
         },
         step_9_correct: {
           title: "Benar!",
@@ -284,12 +297,12 @@ const ALL_TEXTS = {
         },
         step_9_incorrect: {
           title: "Coba Lagi!",
-          text: "Ups! Angka 2 muncul dua kali di 12 tetapi tidak di 15.",
+          text: "Ups! 60 memiliki dua angka 2, tetapi 42 hanya memiliki satu angka 2.",
         },
 
         step_10_start: {
           title: "Mari Menemukan KPK",
-          text: "Sekarang, lihatlah batang prima-3. Baik 12 maupun 15 memiliki satu angka 3. Ketuk 12 atau 15 untuk membawa angka 3 ke kotak KPK.",
+          text: "Sekarang, lihatlah batang prima-3. Baik 42 maupun 60 memiliki satu angka 3. Ketuk 42 atau 60 untuk membawa angka 3 ke kotak KPK.",
         },
         step_10_correct: {
           title: "Hore!",
@@ -298,7 +311,7 @@ const ALL_TEXTS = {
 
         step_11_start: {
           title: "Mari Menemukan KPK",
-          text: "Terakhir, batang prima-5. Ketuk 12 atau 15—yang memiliki lebih banyak angka 5.",
+          text: "Sekarang, batang prima-5. Ketuk 42 atau 60—yang memiliki lebih banyak angka 5.",
         },
         step_11_correct: {
           title: "Benar!",
@@ -306,12 +319,25 @@ const ALL_TEXTS = {
         },
         step_11_incorrect: {
           title: "Coba Lagi!",
-          text: "Ups! 15 memiliki angka 5, tetapi 12 tidak.",
+          text: "Ups! 60 memiliki angka 5, tetapi 42 tidak.",
         },
 
-        step_12: {
+        step_12_start: {
+          title: "Mari Menemukan KPK",
+          text: "Terakhir, batang prima-7. Ketuk 42 atau 60—yang memiliki lebih banyak angka 7.",
+        },
+        step_12_correct: {
+          title: "Benar!",
+          text: "Itu Benar! Kami telah menempatkan satu angka 7 di kotak KPK.",
+        },
+        step_12_incorrect: {
+          title: "Coba Lagi!",
+          text: "Ups! 42 memiliki angka 7, tetapi 60 tidak.",
+        },
+
+        step_13: {
           title: "Hasilnya!",
-          text: "Ayo Cari KPK!<br>KPK dari 12 dan 15<br>= <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='3'>3</span> × <span class='num-prime' data-value='5'>5</span><br>= 60",
+          text: "Ayo Cari KPK!<br>KPK dari 42 dan 60<br>= <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='2'>2</span> × <span class='num-prime' data-value='3'>3</span> × <span class='num-prime' data-value='5'>5</span> × <span class='num-prime' data-value='7'>7</span><br>= 420",
         },
 
         final_screen: {
