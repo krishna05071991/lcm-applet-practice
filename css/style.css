@@ -629,13 +629,25 @@ body {
 }
 
 /* --- LCM Question Screen Styles --- */
+.lcm-question-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.lcm-question-container .lcm-graph-wrapper {
+  width: 80%;
+  max-width: 60vw;
+}
+
 .lcm-options-container {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   gap: 2vw;
-  margin-top: 3vh;
-  padding: 2vh 2vw;
+  width: 100%;
+  flex-wrap: wrap;
 }
 
 .lcm-option-button {

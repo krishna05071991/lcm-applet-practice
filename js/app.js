@@ -615,6 +615,85 @@ function introduceLcmBox() {
   showFtue(nextButton);
 }
 
+function showLcmQuestion() {
+  updateInstructions("step_13");
+  
+  // Clear activity area and set up layout
+  activityArea.innerHTML = "";
+  activityArea.style.flexDirection = "column";
+  activityArea.style.gap = "3vh";
+  activityArea.style.alignItems = "center";
+  activityArea.style.justifyContent = "center";
+  
+  // Show only the LCM box at the top
+  const lcmContainer = document.createElement("div");
+  lcmContainer.className = "lcm-question-container";
+  
+  const factorsInBox = lcmBoxFactors.map((f) => f.prime);
+  const lcmGraph = createLcmGraphDOM("LCM", factorsInBox, 15, true, false, {
+    isLcmBox: true,
+  });
+  lcmGraph.classList.add("highlight-box");
+  lcmContainer.appendChild(lcmGraph);
+  
+  activityArea.appendChild(lcmContainer);
+  
+  // Hide navigation buttons
+  prevButton.style.display = "none";
+  nextButton.style.display = "none";
+  
+  // Create answer options
+  const optionsContainer = document.createElement("div");
+  optionsContainer.className = "lcm-options-container";
+  
+  LCM_OPTIONS.forEach((option) => {
+    const button = document.createElement("button");
+    button.className = "lcm-option-button";
+    button.textContent = option;
+    
+    button.addEventListener("click", () => {
+      if (option === CORRECT_LCM) {
+        // Correct answer
+        audioPlay("correct");
+        setJaxPose("correct");
+        setContextBoxState("correct");
+        updateInstructions("step_13_correct");
+        
+        // Disable all buttons
+        optionsContainer.querySelectorAll("button").forEach(btn => {
+          btn.disabled = true;
+        });
+        button.classList.add("correct");
+        
+        // Show next button after delay
+        setTimeout(() => {
+          nextButton.style.display = "inline-block";
+          nextButton.disabled = false;
+          showFtue(nextButton);
+        }, 2000);
+      } else {
+        // Wrong answer
+        audioPlay("wrong");
+        setJaxPose("wrong");
+        setContextBoxState("incorrect");
+        updateInstructions("step_13_incorrect");
+        button.classList.add("incorrect");
+        
+        setTimeout(() => {
+          button.classList.remove("incorrect");
+          setJaxPose("normal");
+          setContextBoxState("normal");
+          updateInstructions("step_13");
+        }, 2000);
+      }
+    });
+    
+    optionsContainer.appendChild(button);
+  });
+  
+  activityArea.appendChild(optionsContainer);
+}
+
 async function showFinalLcmResult() {
   updateInstructions("step_13");
   drawLcmBoard();
