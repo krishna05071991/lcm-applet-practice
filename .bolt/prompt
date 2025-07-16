@@ -1,5 +1,3 @@
-# EdTech Applet Development - Technical Constraints for Bolt.new
-
 ## Critical Technical Requirements
 
 **Frame & Display:**
@@ -13,11 +11,6 @@
 - Complete offline functionality from folder without server/localhost
 - Zero CORS errors or web-server dependencies
 - No online library calls or external CDN dependencies
-
-**Delivery Format:**
-- Single HTML file with embedded CSS and JavaScript, OR
-- Single ZIP file with all assets included
-- All dependencies must be bundled/embedded - no external links
 
 **Typography & Scaling:**
 - Use standard web-fonts: Baloo, Arial, or similar sans-serif
