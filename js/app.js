@@ -492,8 +492,10 @@ async function transitionToLcmGraph(number, instructionKey) {
   const lcmArea = document.createElement("div");
   lcmArea.className = "lcm-area visible";
   
-  // Initially hide the entire LCM area
-  lcmArea.style.display = "none";
+  // Make LCM area layout-visible but transparent for correct positioning
+  lcmArea.style.display = "flex";
+  lcmArea.style.opacity = "0";
+  lcmArea.style.transition = "opacity 0.5s ease-in-out";
   
   // Create graph with nodes having text
   const graphWrapper = createLcmGraphDOM(number, [], 15, true, false, {
@@ -528,10 +530,10 @@ async function transitionToLcmGraph(number, instructionKey) {
   // Wait for all node animations to complete
   await Promise.all(animationPromises);
 
-  // Show the entire LCM area after all animations complete
-  lcmArea.style.display = "flex";
+  // Fade in the LCM area smoothly after all animations complete
+  lcmArea.style.opacity = "1";
   
-  // Set the final state of the graph nodes to be visible
+  // Set the final state of the graph nodes to be visible  
   graphWrapper
     .querySelectorAll(".lcm-node-stack .tree-node")
     .forEach((node) => {
