@@ -15,27 +15,27 @@ const QUESTIONS = [
     numbers: { num1: 42, num2: 60 },
     correctLcm: 420,
     lcmOptions: [19, 420, 210],
-    globalStepStart: 1,
-    globalStepEnd: 15,
-    globalFinalScreenStep: 16
+    globalStepStart: 0,
+    globalStepEnd: 14,
+    globalFinalScreenStep: 15
   },
   {
     id: "Q2", 
     numbers: { num1: 90, num2: 100 },
     correctLcm: 900,
     lcmOptions: [900, 450, 1800],
-    globalStepStart: 18,
-    globalStepEnd: 32,
-    globalFinalScreenStep: 33
+    globalStepStart: 16,
+    globalStepEnd: 30,
+    globalFinalScreenStep: 31
   },
   {
     id: "Q3",
     numbers: { num1: 150, num2: 252 },
     correctLcm: 6300,
     lcmOptions: [6300, 3150, 12600],
-    globalStepStart: 35,
-    globalStepEnd: 49,
-    globalFinalScreenStep: 50
+    globalStepStart: 32,
+    globalStepEnd: 46,
+    globalFinalScreenStep: 47
   }
 ];
 
@@ -177,12 +177,6 @@ function renderStep(globalStep) {
   // Default to row layout for most single-item displays
   activityArea.style.flexDirection = "row";
 
-  // Handle challenge screens
-  if (globalStep === 0 || globalStep === 17 || globalStep === 34) {
-    showChallengeScreen(globalStep);
-    return;
-  }
-
   switch (relativeStep) {
     case 0:
       cleanUpIntro();
@@ -299,9 +293,6 @@ function renderStep(globalStep) {
 function cleanUpIntro() {
   const btnContainer = document.getElementById("start-button-container");
   if (btnContainer) btnContainer.remove();
-  
-  const challengeScreen = document.querySelector(".challenge-screen");
-  if (challengeScreen) challengeScreen.remove();
 }
 
 // =========================
