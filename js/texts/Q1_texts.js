@@ -3,7 +3,7 @@ const Q1_TEXTS = {
   en: {
     step_Q1_0: {
       title: "Hello!",
-      text: "Today, let's explore finding the LCM of 42 and 60 using prime factorisation.",
+      text: "Let's solve a few challenges to find the LCM of two numbers using prime factorisation.",
     },
     step_Q1_1: {
       title: "Magical Hammer",

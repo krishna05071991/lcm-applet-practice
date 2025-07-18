@@ -373,8 +373,8 @@ body {
   background: linear-gradient(145deg, #2d9d49, #4caf50);
   box-shadow: 0 0.5vh 0px #1b5e20;
   border-radius: 10%;
-  width: 4.5vw;
-  height: 4.5vw;
+  width: 4vw;
+  height: 4vw;
 }
 .tree-node.incorrect {
   background: linear-gradient(145deg, #d32f2f, #f44336);

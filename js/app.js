@@ -163,14 +163,21 @@ function renderStep(globalStep) {
   
   const relativeStep = getRelativeStep(globalStep, currentQuestion);
   
+  // Handle challenge screens
+  if (globalStep === 0 || globalStep === 17 || globalStep === 34) {
+    showChallengeScreen(globalStep);
+    return;
+  }
+  
   nextButton.disabled = true;
   hideFtue();
   setJaxPose("normal");
   setContextBoxState("normal");
   appletContainer.classList.remove("initial-state");
+  rightPanel.style.display = "flex";
 
   // Clear layout at the start of specific relative steps
-  const stepsThatClearLayout = [0, 1, 4, 6, 13];
+  const stepsThatClearLayout = [1, 4, 6, 13];
   if (stepsThatClearLayout.includes(relativeStep)) {
     activityArea.innerHTML = "";
   }
@@ -178,26 +185,8 @@ function renderStep(globalStep) {
   activityArea.style.flexDirection = "row";
 
   switch (relativeStep) {
-    case 0:
-      cleanUpIntro();
-      lcmBoxFactors = [];
-      factorizations = {};
-      appletContainer.classList.add("initial-state");
-      rightPanel.style.display = "none";
-      updateInstructions(0);
-      const startButtonContainer = document.createElement("div");
-      startButtonContainer.id = "start-button-container";
-      const startButton = createButton(T.button_texts.start, () =>
-        renderStep(globalStep + 1)
-      );
-      startButtonContainer.appendChild(startButton);
-      leftPanel.appendChild(startButtonContainer);
-      showFtue(startButton);
-      break;
-
     case 1:
       cleanUpIntro();
-      rightPanel.style.display = "flex";
       updateInstructions(1);
       activityArea.innerHTML = `<div class="hammer-intro-container"><img src="${T.item_images.hammer_passive}"></div>`;
       nextButton.disabled = false;
@@ -247,8 +236,9 @@ function renderStep(globalStep) {
       break;
 
     case 12: // Final LCM Result
-      showFinalLcmResult();
-      break;
+      // Skip the result screen and go directly to the multiple choice question
+      renderStep(globalStep + 1);
+      return;
 
     case 13: // LCM Question Screen
       showLcmQuestion();
@@ -273,7 +263,7 @@ function renderStep(globalStep) {
       if (currentQuestionIndex < QUESTIONS.length - 1) {
         // "Next Question" button
         const nextQuestionButton = createButton(T.button_texts.next_question, () =>
-          renderStep(QUESTIONS[currentQuestionIndex + 1].globalStepStart)
+          renderStep(QUESTIONS[currentQuestionIndex + 1].globalStepStart - 1)
         );
         buttonContainer.appendChild(nextQuestionButton);
       } else {
@@ -477,61 +467,91 @@ function checkAllNodesPrime() {
 // =========================
 async function transitionToLcmGraph(number, instructionKey) {
   updateInstructions(instructionKey);
-  // 1. Remove hammer area and breakdown text, keep the factor tree
+  
+  // 1. Remove hammer area and breakdown text
   const hammerArea = activityArea.querySelector(".hammer-area");
   if (hammerArea) hammerArea.remove();
-
-  // Remove the "Prime factorisation of..." text.
   const breakdownText = activityArea.querySelector(".breakdown-text");
-  if (breakdownText) breakdownText.innerHTML = "";
+  if (breakdownText) breakdownText.remove();
 
-  activityArea.style.flexDirection = "column";
-
-  // 2. Create and append the new graph area below the tree
-  const lcmArea = document.createElement("div");
-  lcmArea.className = "lcm-area visible";
-  // Create graph with nodes having text
-  const graphWrapper = createLcmGraphDOM(number, [], 15, true, false, {
-    showNodeValues: true,
-  });
-  lcmArea.appendChild(graphWrapper);
-  activityArea.appendChild(lcmArea);
-
-  // 3. Animate nodes from the tree to the new graph
-  const animationPromises = [];
-  const rootNodeEl = activityArea.querySelector(".tree-node:not(.prime)");
-  const targetRootLabel = graphWrapper.querySelector(".lcm-graph-root-label");
-  animationPromises.push(animateNode(rootNodeEl, targetRootLabel, true));
-
-  const primeNodesInTree = Array.from(
-    activityArea.querySelectorAll(".factor-tree-area .tree-node.prime")
-  );
-  for (const primeNode of primeNodesInTree) {
-    const primeVal = parseInt(primeNode.textContent);
-    const stack = graphWrapper.querySelector(
-      `.lcm-node-stack[data-prime="${primeVal}"]`
-    );
-    const targetPlaceholder = document.createElement("div");
-    targetPlaceholder.className = "tree-node prime";
-    targetPlaceholder.textContent = primeVal; // Add text content
-    targetPlaceholder.style.opacity = "0";
-    stack.appendChild(targetPlaceholder);
-    animationPromises.push(animateNode(primeNode, targetPlaceholder, true));
+  // 2. Get factor tree for highlighting
+  const factorTreeArea = activityArea.querySelector(".factor-tree-area");
+  if (factorTreeArea) {
+    factorTreeArea.classList.remove("faded");
   }
 
-  await Promise.all(animationPromises);
+  // 3. Sequential highlighting of prime factors in the tree
+  const finalFactors = Object.values(treeData)
+    .filter((n) => n.childrenIds.length === 0)
+    .map((n) => n.value)
+    .sort((a, b) => a - b);
+  
+  // Create breakdown text for highlighting
+  const newBreakdownText = document.createElement("div");
+  newBreakdownText.className = "breakdown-text";
+  const factorsHtml = finalFactors
+    .map((f) => `<span class="num-prime" data-value="${f}">${f}</span>`)
+    .join(" × ");
+  newBreakdownText.innerHTML = `${T.factorisation_text} <span class="num-root" data-value="${number}">${number}</span> = ${factorsHtml}`;
+  
+  if (factorTreeArea) {
+    factorTreeArea.appendChild(newBreakdownText);
+  }
 
-  // 4. Fade out the factor tree area after animation completes
-  const factorTreeArea = activityArea.querySelector(".factor-tree-area");
-  if (factorTreeArea) factorTreeArea.classList.add("faded");
+  // 4. Do highlighting
+  const elementsToHighlight = [];
+  
+  const rootNodeEl = Object.values(treeData)
+    .find((n) => n.value === number)
+    ?.element.querySelector(".tree-node");
+  const rootTextEl = newBreakdownText.querySelector(".num-root");
+  if (rootNodeEl && rootTextEl) {
+    elementsToHighlight.push({ text: rootTextEl, node: rootNodeEl });
+  }
+  
+  const primeTextEls = Array.from(
+    newBreakdownText.querySelectorAll(".num-prime")
+  );
+  const primeNodeEls = Object.values(treeData)
+    .filter((n) => n.childrenIds.length === 0)
+    .sort((a, b) => a.value - b.value)
+    .map((n) => n.element.querySelector(".tree-node.prime"));
 
-  // Set the final state of the graph nodes to be visible
-  graphWrapper
-    .querySelectorAll(".lcm-node-stack .tree-node")
-    .forEach((node) => {
-      node.style.opacity = "1";
-    });
-
+  primeTextEls.forEach((textEl, index) => {
+    if (primeNodeEls[index]) {
+      elementsToHighlight.push({
+        text: textEl,
+        node: primeNodeEls[index],
+      });
+    }
+  });
+  
+  // 5. Execute highlighting
+  await sequentialHighlight(elementsToHighlight, 800, false);
+  
+  // 6. Brief pause
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // 7. HIDE factor tree completely
+  if (factorTreeArea) {
+    factorTreeArea.style.display = "none";
+  }
+  
+  // 8. Show LCM graph with factors already populated
+  activityArea.style.flexDirection = "column";
+  
+  const lcmArea = document.createElement("div");
+  lcmArea.className = "lcm-area";
+  lcmArea.style.display = "flex";
+  
+  const graphWrapper = createLcmGraphDOM(number, finalFactors, 15, true, false, {
+    showNodeValues: true
+  });
+  
+  lcmArea.appendChild(graphWrapper);
+  activityArea.appendChild(lcmArea);
+  
+  // 9. Enable next button
   nextButton.disabled = false;
   showFtue(nextButton);
 }
@@ -547,9 +567,9 @@ function drawLcmBoard(currentPrimeToSelect = null) {
 
   const factorsInBox = lcmBoxFactors.map((f) => f.prime);
 
-  // Use consistent rod height (10vh) for number graphs and a larger height (20vh) for the LCM box.
+  // Use consistent rod height (15vh) for all graphs
   const graph1 = createLcmGraphDOM(currentQuestion.numbers.num1, factorizations[currentQuestion.numbers.num1], 15, true, false);
-  const graph2 = createLcmGraphDOM(currentQuestion.numbers.num2, factorizations[currentQuestion.numbers.num2], 10, true, false);
+  const graph2 = createLcmGraphDOM(currentQuestion.numbers.num2, factorizations[currentQuestion.numbers.num2], 15, true, false);
   const lcmGraph = createLcmGraphDOM("LCM", factorsInBox, 15, true, false, {
     isLcmBox: true,
   });
@@ -697,13 +717,9 @@ function mergeGraphsVisually() {
   activityArea.style.flexDirection = "column";
   activityArea.style.gap = "1vh"; // Reduce gap
 
+  // Use consistent rod height (15vh) for both graphs
   const graph1 = createLcmGraphDOM(currentQuestion.numbers.num1, factorizations[currentQuestion.numbers.num1], 15, false, false); // No axis, no equation
-  const graph2 = createLcmGraphDOM(currentQuestion.numbers.num2, factorizations[currentQuestion.numbers.num2], 10, true, false); // With axis, no equation
-
-  // Custom height increase logic for rods in graph 2
-  graph2
-    .querySelectorAll(".lcm-rod")
-    .forEach((rod) => (rod.style.height = "16vh"));
+  const graph2 = createLcmGraphDOM(currentQuestion.numbers.num2, factorizations[currentQuestion.numbers.num2], 15, true, false); // With axis, no equation
 
   activityArea.appendChild(graph1);
   activityArea.appendChild(graph2);
