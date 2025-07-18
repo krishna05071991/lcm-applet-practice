@@ -145,6 +145,12 @@ function handleNextClick() {
 function renderStep(globalStep) {
   currentStep = globalStep;
   
+  // Handle challenge screens
+  if (globalStep === 0 || globalStep === 17 || globalStep === 34) {
+    renderChallengeScreen(globalStep);
+    return;
+  }
+  
   // Determine current question from global step
   const { question, index } = getCurrentQuestionFromStep(globalStep);
   
@@ -274,7 +280,7 @@ function renderStep(globalStep) {
       if (currentQuestionIndex < QUESTIONS.length - 1) {
         // "Next Question" button
         const nextQuestionButton = createButton(T.button_texts.next_question, () =>
-          renderStep(QUESTIONS[currentQuestionIndex + 1].globalStepStart)
+          renderStep(QUESTIONS[currentQuestionIndex + 1].globalStepStart - 1)
         );
         buttonContainer.appendChild(nextQuestionButton);
       } else {
@@ -288,6 +294,46 @@ function renderStep(globalStep) {
       leftPanel.appendChild(buttonContainer);
       break;
   }
+}
+
+function renderChallengeScreen(globalStep) {
+  let challengeNumber, questionIndex;
+  
+  if (globalStep === 0) {
+    challengeNumber = "01";
+    questionIndex = 0;
+  } else if (globalStep === 17) {
+    challengeNumber = "02";
+    questionIndex = 1;
+  } else if (globalStep === 34) {
+    challengeNumber = "03";
+    questionIndex = 2;
+  }
+  
+  const question = QUESTIONS[questionIndex];
+  
+  // Clean up interface
+  cleanUpIntro();
+  appletContainer.classList.add("initial-state");
+  rightPanel.style.display = "none";
+  hideFtue();
+  
+  // Create challenge screen
+  const challengeScreen = document.createElement("div");
+  challengeScreen.className = "challenge-screen";
+  challengeScreen.innerHTML = `
+    <div class="challenge-title">Challenge</div>
+    <div class="challenge-number">${challengeNumber}</div>
+    <div class="challenge-question">Find the LCM of ${question.numbers.num1} and ${question.numbers.num2}.</div>
+  `;
+  
+  activityArea.innerHTML = "";
+  activityArea.appendChild(challengeScreen);
+  
+  // Auto-advance after 3 seconds
+  setTimeout(() => {
+    renderStep(globalStep + 1);
+  }, 3000);
 }
 
 function cleanUpIntro() {
