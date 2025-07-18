@@ -163,21 +163,14 @@ function renderStep(globalStep) {
   
   const relativeStep = getRelativeStep(globalStep, currentQuestion);
   
-  // Handle challenge screens
-  if (globalStep === 0 || globalStep === 17 || globalStep === 34) {
-    showChallengeScreen(globalStep);
-    return;
-  }
-  
   nextButton.disabled = true;
   hideFtue();
   setJaxPose("normal");
   setContextBoxState("normal");
   appletContainer.classList.remove("initial-state");
-  rightPanel.style.display = "flex";
 
   // Clear layout at the start of specific relative steps
-  const stepsThatClearLayout = [1, 4, 6, 13];
+  const stepsThatClearLayout = [0, 1, 4, 6, 13];
   if (stepsThatClearLayout.includes(relativeStep)) {
     activityArea.innerHTML = "";
   }
@@ -185,8 +178,26 @@ function renderStep(globalStep) {
   activityArea.style.flexDirection = "row";
 
   switch (relativeStep) {
+    case 0:
+      cleanUpIntro();
+      lcmBoxFactors = [];
+      factorizations = {};
+      appletContainer.classList.add("initial-state");
+      rightPanel.style.display = "none";
+      updateInstructions(0);
+      const startButtonContainer = document.createElement("div");
+      startButtonContainer.id = "start-button-container";
+      const startButton = createButton(T.button_texts.start, () =>
+        renderStep(globalStep + 1)
+      );
+      startButtonContainer.appendChild(startButton);
+      leftPanel.appendChild(startButtonContainer);
+      showFtue(startButton);
+      break;
+
     case 1:
       cleanUpIntro();
+      rightPanel.style.display = "flex";
       updateInstructions(1);
       activityArea.innerHTML = `<div class="hammer-intro-container"><img src="${T.item_images.hammer_passive}"></div>`;
       nextButton.disabled = false;
@@ -263,7 +274,7 @@ function renderStep(globalStep) {
       if (currentQuestionIndex < QUESTIONS.length - 1) {
         // "Next Question" button
         const nextQuestionButton = createButton(T.button_texts.next_question, () =>
-          renderStep(QUESTIONS[currentQuestionIndex + 1].globalStepStart - 1)
+          renderStep(QUESTIONS[currentQuestionIndex + 1].globalStepStart)
         );
         buttonContainer.appendChild(nextQuestionButton);
       } else {
