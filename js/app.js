@@ -15,27 +15,27 @@ const QUESTIONS = [
     numbers: { num1: 42, num2: 60 },
     correctLcm: 420,
     lcmOptions: [19, 420, 210],
-    globalStepStart: 0,
-    globalStepEnd: 14,
-    globalFinalScreenStep: 15
+    globalStepStart: 1,
+    globalStepEnd: 15,
+    globalFinalScreenStep: 16
   },
   {
     id: "Q2", 
     numbers: { num1: 90, num2: 100 },
     correctLcm: 900,
     lcmOptions: [900, 450, 1800],
-    globalStepStart: 16,
-    globalStepEnd: 30,
-    globalFinalScreenStep: 31
+    globalStepStart: 18,
+    globalStepEnd: 32,
+    globalFinalScreenStep: 33
   },
   {
     id: "Q3",
     numbers: { num1: 150, num2: 252 },
     correctLcm: 6300,
     lcmOptions: [6300, 3150, 12600],
-    globalStepStart: 32,
-    globalStepEnd: 46,
-    globalFinalScreenStep: 47
+    globalStepStart: 35,
+    globalStepEnd: 49,
+    globalFinalScreenStep: 50
   }
 ];
 
@@ -145,12 +145,6 @@ function handleNextClick() {
 function renderStep(globalStep) {
   currentStep = globalStep;
   
-  // Handle challenge screens
-  if (globalStep === 0 || globalStep === 17 || globalStep === 34) {
-    renderChallengeScreen(globalStep);
-    return;
-  }
-  
   // Determine current question from global step
   const { question, index } = getCurrentQuestionFromStep(globalStep);
   
@@ -182,6 +176,12 @@ function renderStep(globalStep) {
   }
   // Default to row layout for most single-item displays
   activityArea.style.flexDirection = "row";
+
+  // Handle challenge screens
+  if (globalStep === 0 || globalStep === 17 || globalStep === 34) {
+    showChallengeScreen(globalStep);
+    return;
+  }
 
   switch (relativeStep) {
     case 0:
@@ -280,7 +280,7 @@ function renderStep(globalStep) {
       if (currentQuestionIndex < QUESTIONS.length - 1) {
         // "Next Question" button
         const nextQuestionButton = createButton(T.button_texts.next_question, () =>
-          renderStep(QUESTIONS[currentQuestionIndex + 1].globalStepStart - 1)
+          renderStep(QUESTIONS[currentQuestionIndex + 1].globalStepStart)
         );
         buttonContainer.appendChild(nextQuestionButton);
       } else {
@@ -296,49 +296,12 @@ function renderStep(globalStep) {
   }
 }
 
-function renderChallengeScreen(globalStep) {
-  let challengeNumber, questionIndex;
-  
-  if (globalStep === 0) {
-    challengeNumber = "01";
-    questionIndex = 0;
-  } else if (globalStep === 17) {
-    challengeNumber = "02";
-    questionIndex = 1;
-  } else if (globalStep === 34) {
-    challengeNumber = "03";
-    questionIndex = 2;
-  }
-  
-  const question = QUESTIONS[questionIndex];
-  
-  // Clean up interface
-  cleanUpIntro();
-  appletContainer.classList.add("initial-state");
-  rightPanel.style.display = "none";
-  hideFtue();
-  
-  // Create challenge screen
-  const challengeScreen = document.createElement("div");
-  challengeScreen.className = "challenge-screen";
-  challengeScreen.innerHTML = `
-    <div class="challenge-title">Challenge</div>
-    <div class="challenge-number">${challengeNumber}</div>
-    <div class="challenge-question">Find the LCM of ${question.numbers.num1} and ${question.numbers.num2}.</div>
-  `;
-  
-  activityArea.innerHTML = "";
-  activityArea.appendChild(challengeScreen);
-  
-  // Auto-advance after 3 seconds
-  setTimeout(() => {
-    renderStep(globalStep + 1);
-  }, 3000);
-}
-
 function cleanUpIntro() {
   const btnContainer = document.getElementById("start-button-container");
   if (btnContainer) btnContainer.remove();
+  
+  const challengeScreen = document.querySelector(".challenge-screen");
+  if (challengeScreen) challengeScreen.remove();
 }
 
 // =========================

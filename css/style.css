@@ -724,6 +724,46 @@ body {
   justify-content: center;
 }
 
+/* Challenge Screen Styles */
+.challenge-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 3vh;
+  text-align: center;
+}
+
+.challenge-title {
+  font-size: calc(2rem + 4vw);
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 0.2vh 0.4vh rgba(0, 0, 0, 0.3);
+}
+
+.challenge-number {
+  width: 12vw;
+  height: 12vw;
+  background: linear-gradient(45deg, #18abe6, #096ac5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(1.5rem + 3vw);
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 0.5vh 1vh rgba(0, 0, 0, 0.3);
+}
+
+.challenge-question {
+  font-size: calc(1rem + 2vw);
+  color: white;
+  font-weight: 500;
+  text-shadow: 0 0.1vh 0.2vh rgba(0, 0, 0, 0.3);
+  max-width: 80%;
+}
+
 /********************************************
  * 7) HIGHLIGHT AND FINAL SUMMARY STYLES
  *********************************************/
